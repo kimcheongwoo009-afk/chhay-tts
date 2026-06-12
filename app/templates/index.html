@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chhay TTS Pro</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background: rgba(255,255,255,0.05);
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.brand {
+    color: #06B6D4;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 160px;
+    padding: 15px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+}
+
+.btn {
+    margin-top: 15px;
+    width: 100%;
+    padding: 15px;
+    background: #F59E0B;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+
+#loading {
+    margin-top: 15px;
+    color: #F59E0B;
+    display: none;
+}
+
+audio {
+    margin-top: 20px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+a {
+    display: inline-block;
+    margin-top: 10px;
+    color: #06B6D4;
+    text-decoration: none;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="brand">Chhay TTS PRO</div>
+
+    <h1>Text to Speech AI</h1>
+
+    <p>Convert Khmer & English text into natural voice</p>
+
+    <textarea id="text" placeholder="Enter your text..."></textarea>
+
+    <button class="btn" id="btn" onclick="generateSpeech()">
+        Generate Speech
+    </button>
+
+    <p id="loading">🔄 Generating speech...</p>
+
+    <audio id="audioPlayer" controls style="display:none;"></audio>
+
+    <a id="downloadBtn" href="#" download style="display:none;">
+        Download Audio
+    </a>
+
+</div>
+
+<script>
+async function generateSpeech() {
+
+    const text = document.getElementById("text").value;
+    const btn = document.getElementById("btn");
+    const loading = document.getElementById("loading");
+
+    btn.disabled = true;
+    loading.style.display = "block";
+
+    const res = await fetch("/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text: text })
+    });
+
+    const data = await res.json();
+
+    const player = document.getElementById("audioPlayer");
+    player.src = data.audio + "?t=" + Date.now();
+    player.style.display = "block";
+    player.load();
+    player.play();
+
+    const downloadBtn = document.getElementById("downloadBtn");
+    downloadBtn.href = data.audio;
+    downloadBtn.style.display = "block";
+
+    btn.disabled = false;
+    loading.style.display = "none";
+}
+</script>
+
+</body>
+</html>
